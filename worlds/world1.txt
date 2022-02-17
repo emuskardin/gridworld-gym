@@ -1,0 +1,73 @@
+===Layout===
+
+// E is ego, that is starting position and player indication when rendering
+// G is the goal. Once it is reached, episode terminates. There can be multiple goals.
+
+#########
+#   #   #
+#   D  E#
+#   #   #
+##D######
+#   # G #
+#   D   #
+#   #   #
+#########
+
+===Abstraction===
+
+// If no abstraction is defined for a tile (tile is empty), x and y coordinates will be returned.
+
+#########
+#111#222#
+#111D222#
+#111#222#
+##D######
+#333#444#
+#333D444#
+#333#444#
+#########
+
+// Optional mapping of integers/characters to their description/name
+
+2:corridor
+3:living_room
+4:toilet
+
+===Behaviour===
+
+#########
+#1  # 3 #
+# 2 D   #
+#1  # 2 #
+##D######
+# 1  #2 #
+#   D   #
+# 2 #3  #
+#########
+
+// Rules
+// <rule_id>-<action>-[(<new_action>:<probability>)+]
+
+1-up-[up:0.75, right:0.25]
+1-down-[down:0.75, right:0.25]
+2-left-[left:0.8, up:0.1, down:0.1]
+3-right-[right:0.7, down:0.2, left:0.1]
+
+===Rewards===
+
+#########
+#   #   #
+# a D   #
+#*  #   #
+##D######
+#   #   #
+# b D   #
+#*  # *c#
+#########
+
+// Mapping of reward tile to reward value. Only positive and negative integers possible.
+
+a:1
+b:2
+c:3
+*:-5
