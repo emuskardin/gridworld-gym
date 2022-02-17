@@ -7,8 +7,8 @@ This environments can be used for testing and development of planning and classi
 Partial observability stems from abstraction over the state representation.
 In future iteration user will be able to define non-Markovian goals.
 
-**Working example** can be found in the `q_learning.py` file, where one can see how classic Q-learning fails to learn
-good policy in the presence of the abstraction (of the state representation).
+**Working example** can be found in the `q_learning.py` file, where one can see how classic Q-learning often fails 
+to learn good policy in the presence of the abstraction (of the state representation).
 
 ## World Generation 
 
