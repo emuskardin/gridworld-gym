@@ -15,7 +15,8 @@ is_partially_obs = False
 # Otherwise, reward will be given every time
 one_time_rewards = True
 
-env = gym.make('poge-v1', world_file_path='worlds/world1.txt',
+env = gym.make(id='poge-v1',
+               world_file_path='worlds/world0.txt',
                force_determinism=force_determinism,
                indicate_slip=indicate_slip,
                is_partially_obs=is_partially_obs,

@@ -75,7 +75,10 @@ class PartiallyObsGridworldParser:
     def _parse_world_and_abstract_world(self):
         self.world = [list(l.strip()) for l in self.content['Layout']]
         self.abstract_world = [list(l.strip()) for l in self.content['Abstraction'][:len(self.world)]]
-        assert len(self.world) == len(self.abstract_world)
+        if not self.content['Abstraction']:
+            self.abstract_world = None
+        else:
+            assert len(self.world) == len(self.abstract_world)
 
     def _parse_abstraction_mappings(self):
         abstract_tiles = set()

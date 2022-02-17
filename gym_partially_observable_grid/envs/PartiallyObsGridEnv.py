@@ -45,6 +45,10 @@ class PartiallyObservableWorld(gym.Env):
         # Indicate whether observations will be abstracted or will they be x-y coordinates
         self.is_partially_obs = is_partially_obs
 
+        # If abstraction is not defined, environment cannot be partially observable
+        if self.abstract_world is None:
+            self.is_partially_obs = False
+
         # Variables
         self.initial_location = parser.initial_location
         self.player_location = parser.player_location
@@ -82,7 +86,7 @@ class PartiallyObservableWorld(gym.Env):
                         counter += 1
 
         # add tiles reachable by slip actions to observation space
-        if self.indicate_slip:
+        if self.is_partially_obs and self.indicate_slip:
             for xy, tile in self.stochastic_tile.items():
                 slip_actions = self.rules[tile].get_all_actions()
                 x, y = xy

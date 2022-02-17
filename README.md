@@ -22,13 +22,15 @@ The file is divided into sections:
 
 Each section starts with the `===<section name>===`.
 
-More details about each aspect of the world generations are presented under the example.
+More details about each aspect of the world generation and enviroment initialization are presented after the example.
 
 Reserved characters:
 - `#` - wall 
 - `D` - door in the wall (player just passes through it)
 - `E` - starting player location
 - `G` - goal location(s)
+
+
 
 ## Example World
 ```
@@ -152,3 +154,28 @@ Mapping of symbols to reward can be seen in the example. It follows the `<symbol
 
 If the `one_time_rewards` param is set to True (by default it is), then the reward for each tile will be received once per episode. 
 Else it will be received every time player is on the reward tile.
+
+## Initialize gridworld environment
+
+```python
+import gym
+import gym_partially_observable_grid
+
+# Make environment deterministic even if it is stochastic
+force_determinism = False
+# Add slip to the observation set (action failed). Only necessary if is_partially_obs is set to True AND you want
+# the underlying system to behave like deterministic MDP. If is_partially_obs is set to False, this value is ignored.
+indicate_slip = True
+# Use abstraction/partial observability. If set to False, (x,y) coordinates will be used as outputs
+is_partially_obs = False
+# If one_time_rewards is set to True, reward in single location will be obtained only once per episode.
+# Otherwise, reward will be given every time
+one_time_rewards = True
+
+env = gym.make(id='poge-v1', 
+               world_file_path='worlds/world0.txt',
+               force_determinism=force_determinism,
+               indicate_slip=indicate_slip,
+               is_partially_obs=is_partially_obs,
+               one_time_rewards=one_time_rewards)
+```
