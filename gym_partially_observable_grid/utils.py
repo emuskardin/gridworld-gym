@@ -163,6 +163,3 @@ class PartiallyObsGridworldParser:
 
         self.rules[rule_id].add_stochastic_action(rule_action, action_prob_pairs)
 
-
-if __name__ == '__main__':
-    p = PartiallyObsGridworldParser('../../worlds/world0.txt')

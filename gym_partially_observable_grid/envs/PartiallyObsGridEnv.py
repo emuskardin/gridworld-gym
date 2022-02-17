@@ -73,38 +73,26 @@ class PartiallyObservableWorld(gym.Env):
         world_to_process = self.world if not self.is_partially_obs else self.abstract_world
         for x, row in enumerate(world_to_process):
             for y, tile in enumerate(row):
-                if tile not in {'#', 'D'}:
-                    if self.is_partially_obs and tile not in abstract_symbols:
-                        abstract_symbols.add(tile)
-                        self.state_2_one_hot_map[tile] = counter
-                        counter += 1
-                    if self.is_partially_obs and tile == ' ':
-                        self.state_2_one_hot_map[(x, y)] = counter
-                        counter += 1
-                    elif not self.is_partially_obs:
+                if tile not in {'#', 'D', 'E'}:
+                    if self.is_partially_obs:
+                        if tile == ' ' or tile == 'G':
+                            self.state_2_one_hot_map[(x, y)] = counter
+                            counter += 1
+                        else:
+                            abstraction = self.abstract_symbol_name_map[tile]
+                            if abstraction not in abstract_symbols:
+                                abstract_symbols.add(abstraction)
+                                self.state_2_one_hot_map[abstraction] = counter
+                                counter += 1
+                    else:
                         self.state_2_one_hot_map[(x, y)] = counter
                         counter += 1
 
-        # add tiles reachable by slip actions to observation space
-        if self.is_partially_obs and self.indicate_slip:
-            for xy, tile in self.stochastic_tile.items():
-                slip_actions = self.rules[tile].get_all_actions()
-                x, y = xy
-                for slip_act in slip_actions:
-                    if slip_act == 0:  # up
-                        x -= 1
-                    if slip_act == 1:  # down
-                        x += 1
-                    if slip_act == 2:  # left
-                        y -= 1
-                    if slip_act == 3:  # right
-                        y += 1
-
-                    reached_abstract = f'{self.abstract_world[x][y]}_slip'
-                    if self.is_partially_obs and reached_abstract not in abstract_symbols:
-                        abstract_symbols.add(reached_abstract)
-                        self.state_2_one_hot_map[reached_abstract] = counter
-                        counter += 1
+        if self.rules:
+            for state in list(self.state_2_one_hot_map.keys()):
+                slip_state = f'{state}_slip'
+                self.state_2_one_hot_map[slip_state] = counter
+                counter += 1
 
         self.one_hot_2_state_map = {v: k for k, v in self.state_2_one_hot_map.items()}
         return counter
