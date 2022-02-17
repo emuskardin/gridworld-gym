@@ -43,7 +43,6 @@ for i in range(1, num_training_episodes + 1):
         action = env.action_space.sample() if random.random() < epsilon else np.argmax(q_table[state])
 
         next_state, reward, done, info = env.step(action)
-        print(env.get_abstraction())
 
         old_value = q_table[state, action]
 
