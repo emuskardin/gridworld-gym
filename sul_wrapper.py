@@ -18,7 +18,10 @@ class StochasticWorldSUL(SUL):
 
     def step(self, letter):
         if letter is None:
-            return self.world.get_abstraction()
+            output = self.world.get_abstraction()
+            if output[0].isdigit().isdigit():
+                output = f'state_{output}'
+            return output
 
         output, reward, done, info = self.world.step(self.world.actions_dict[letter])
 
@@ -36,7 +39,7 @@ class StochasticWorldSUL(SUL):
         if reward != 0:
             reward = reward if reward > 0 else f'neg_{reward * -1}'
 
-        if output.isdigit():
+        if output[0].isdigit():
             output = f'state_{output}'
         if reward != 0:
             output = f'{output}_r_{reward}'
