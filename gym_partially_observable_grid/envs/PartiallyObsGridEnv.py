@@ -1,4 +1,5 @@
 from copy import deepcopy
+from sys import stdout
 
 import gym
 from gym import spaces
@@ -185,8 +186,12 @@ class PartiallyObservableWorld(gym.Env):
 
     def play(self):
         self.reset()
+        user_input_map = {'w':0, 's':1, 'a':2, 'd':3}
+        print('Agent is controlled with w,a,s,d; for up,left,down,right actions.')
         while True:
-            action = int(input('Action (up:0, down:1, left:2, right:3}): '))
-            o = self.step(action)
             self.render()
-            print(o)
+            action = input('Action: ',)
+            stdout.flush()
+            o = self.step(user_input_map[action])
+            print(f'Output: {o}')
+
