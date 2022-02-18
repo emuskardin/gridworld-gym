@@ -1,5 +1,4 @@
 from copy import deepcopy
-from sys import stdout
 
 import gym
 from gym import spaces
@@ -191,7 +190,6 @@ class PartiallyObservableWorld(gym.Env):
         while True:
             self.render()
             action = input('Action: ',)
-            stdout.flush()
             o = self.step(user_input_map[action])
             print(f'Output: {o}')
 
