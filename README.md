@@ -115,8 +115,7 @@ c:3
 *Layout* section is a necessity for minimal working examples.
 All other sections are optional.
 All sections should contain the same border structure.
-In the *Layout* section, we define the layout of the environment and the starting and 
-goal positions.
+In the *Layout* section, we define the layout of the environment and the starting, goal, and terminal positions.
 
 
 *Rewards* define the reward structure, that is whether a positive or a negative reward is received once the player reaches 
