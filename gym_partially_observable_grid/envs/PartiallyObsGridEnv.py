@@ -53,15 +53,16 @@ class PartiallyObservableWorld(gym.Env):
         # Variables
         self.initial_location = parser.initial_location
         self.player_location = parser.player_location
-        self.goal_location = parser.goal_location
+        self.goal_locations = parser.goal_location
+        self.terminal_locations = parser.terminal_locations
 
-        # Reward reached when reaching goal
+        # Reward reached when reaching goal or negative amount when terminal state will be reached
         self.goal_reward = goal_reward
 
         # Step penalty that will be returned every every step if the reward is not reached
-        self.step_penalty = step_penalty
+        self.step_penalty = step_penalty if step_penalty < 0 else step_penalty * -1
 
-        # Episode lenght
+        # Episode length
         self.max_ep_len = max_ep_len
         self.step_counter = 0
 
@@ -128,13 +129,21 @@ class PartiallyObservableWorld(gym.Env):
                 reward = self.reward_tiles[self.player_location]
             self.collected_rewards.add(self.player_location)
 
-        if self.player_location in self.goal_location:
+        done = False
+
+        if self.player_location in self.goal_locations:
             reward = self.goal_reward
+            done = True
+        if self.player_location in self.terminal_locations:
+            reward = self.goal_reward * -1
+            done = True
+
+        if self.step_counter >= self.max_ep_len:
+            done = True
 
         if self.step_penalty != 0 and reward == 0:
             reward = self.step_penalty
 
-        done = 1 if self.player_location in self.goal_location or self.step_counter >= self.max_ep_len else 0
         observation = self.get_observation()
 
         return self.encode(observation), reward, done, {}
@@ -192,11 +201,10 @@ class PartiallyObservableWorld(gym.Env):
 
     def play(self):
         self.reset()
-        user_input_map = {'w':0, 's':1, 'a':2, 'd':3}
+        user_input_map = {'w': 0, 's': 1, 'a': 2, 'd': 3}
         print('Agent is controlled with w,a,s,d; for up,left,down,right actions.')
         while True:
             self.render()
-            action = input('Action: ',)
+            action = input('Action: ', )
             o = self.step(user_input_map[action])
             print(f'Output: {o}')
-

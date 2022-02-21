@@ -4,7 +4,7 @@
 // G is the goal. Once it is reached, episode terminates. There can be multiple goals.
 
 #########
-#   #   #
+#   # T #
 #   D  E#
 #   #   #
 ##D######

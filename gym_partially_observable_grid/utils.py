@@ -46,6 +46,7 @@ class PartiallyObsGridworldParser:
         self.initial_location = None
         self.player_location = None
         self.goal_location = set()
+        self.terminal_locations = set()
 
         self._parse_file(path_to_file)
         self._parse_world_and_abstract_world()
@@ -100,13 +101,16 @@ class PartiallyObsGridworldParser:
                 self.abstract_symbol_name_map[at] = at
 
     def _parse_player_and_goal_positions(self):
-        for i, l in enumerate(self.content['Layout']):
-            if 'E' in l:
-                self.player_location = (i, l.index('E'))
-                self.initial_location = (i, l.index('E'))
-                self.world[self.player_location[0]][self.player_location[1]] = ' '
-            if 'G' in l:
-                self.goal_location.add((i, l.index('G')))
+        for x, line in enumerate(self.content['Layout']):
+            for y, tile in enumerate(line):
+                if tile == 'E':
+                    self.player_location = (x, y)
+                    self.initial_location = (x, y)
+                    self.world[self.player_location[0]][self.player_location[1]] = ' '
+                if tile == 'G':
+                    self.goal_location.add((x, y))
+                if tile == 'T':
+                    self.terminal_locations.add((x, y))
 
         assert self.player_location and self.goal_location
 
@@ -162,4 +166,3 @@ class PartiallyObsGridworldParser:
             action_prob_pairs.append((action, prob))
 
         self.rules[rule_id].add_stochastic_action(rule_action, action_prob_pairs)
-
