@@ -25,7 +25,6 @@ env = gym.make(id='poge-v1',
 
 q_table = np.zeros([env.observation_space.n, env.action_space.n])
 
-env.play()
 
 # Hyper parameters
 alpha = 0.1
@@ -80,7 +79,7 @@ for _ in range(episodes):
         action = np.argmax(q_table[state])
         state, reward, done, info = env.step(action)
 
-        if reward and done:
+        if reward == env.goal_reward and done:
             goals_reached += 1
 
         epochs += 1
