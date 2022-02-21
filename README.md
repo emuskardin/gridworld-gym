@@ -177,5 +177,6 @@ env = gym.make(id='poge-v1',
                force_determinism=force_determinism,
                indicate_slip=indicate_slip,
                is_partially_obs=is_partially_obs,
-               one_time_rewards=one_time_rewards)
+               one_time_rewards=one_time_rewards,
+               step_penalty=0)
 ```

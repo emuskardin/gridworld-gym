@@ -13,8 +13,9 @@ class PartiallyObservableWorld(gym.Env):
                  indicate_slip=False,
                  is_partially_obs=True,
                  max_ep_len=100,
-                 goal_reward=10,
-                 one_time_rewards=True):
+                 goal_reward=100,
+                 one_time_rewards=True,
+                 step_penalty=0):
 
         # Available actions
         self.actions_dict = {'up': 0, 'down': 1, 'left': 2, 'right': 3}
@@ -56,6 +57,9 @@ class PartiallyObservableWorld(gym.Env):
 
         # Reward reached when reaching goal
         self.goal_reward = goal_reward
+
+        # Step penalty that will be returned every every step if the reward is not reached
+        self.step_penalty = step_penalty
 
         # Episode lenght
         self.max_ep_len = max_ep_len
@@ -105,7 +109,7 @@ class PartiallyObservableWorld(gym.Env):
         if self.world[new_location[0]][new_location[1]] == '#':
             observation = self.get_observation()
             done = True if self.step_counter >= self.max_ep_len else False
-            return self.encode(observation), 0, done, {}
+            return self.encode(observation), self.step_penalty, done, {}
 
         # If you open the door, perform that step once more and enter new room
         if self.world[new_location[0]][new_location[1]] == 'D':
@@ -126,6 +130,9 @@ class PartiallyObservableWorld(gym.Env):
 
         if self.player_location in self.goal_location:
             reward = self.goal_reward
+
+        if self.step_penalty != 0 and reward == 0:
+            self.reward_tiles = self.step_penalty
 
         done = 1 if self.player_location in self.goal_location or self.step_counter >= self.max_ep_len else 0
         observation = self.get_observation()
