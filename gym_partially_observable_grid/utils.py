@@ -47,11 +47,12 @@ class PartiallyObsGridworldParser:
         self.player_location = None
         self.goal_location = set()
         self.terminal_locations = set()
+        self.behavioral_toggles = set()
 
         self._parse_file(path_to_file)
         self._parse_world_and_abstract_world()
         self._parse_abstraction_mappings()
-        self._parse_player_and_goal_positions()
+        self._parse_layout_variables()
         self._parse_rewards()
         self._parse_rules()
 
@@ -100,7 +101,7 @@ class PartiallyObsGridworldParser:
             if at not in self.abstract_symbol_name_map.keys():
                 self.abstract_symbol_name_map[at] = at
 
-    def _parse_player_and_goal_positions(self):
+    def _parse_layout_variables(self):
         for x, line in enumerate(self.content['Layout']):
             for y, tile in enumerate(line):
                 if tile == 'E':
@@ -111,6 +112,8 @@ class PartiallyObsGridworldParser:
                     self.goal_location.add((x, y))
                 if tile == 'T':
                     self.terminal_locations.add((x, y))
+                if tile == '@':
+                    self.behavioral_toggles.add((x,y))
 
         assert self.player_location and self.goal_location
 

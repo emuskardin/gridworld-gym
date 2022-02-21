@@ -24,15 +24,13 @@ Each section starts with the `===<section name>===`.
 
 More details about each aspect of the world generation and enviroment initialization are presented after the example.
 
-Reserved characters:
+Reserved characters (used in Layout section):
 - `#` - wall 
 - `D` - door in the wall (player just passes through it)
 - `E` - starting player location
 - `G` - goal location(s)
 - `T` - terminal state. If reached, negative goal reward will be given and episode will be terminated
-
-
-
+- `@` - behavioural toggle. If this state is reached, all stochastic behaviour will become deterministic and vice versa.
 ## Example World
 ```
 ===Layout===

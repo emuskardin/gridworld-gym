@@ -50,11 +50,15 @@ class PartiallyObservableWorld(gym.Env):
         if self.abstract_world is None:
             self.is_partially_obs = False
 
-        # Variables
+        # Layout variables
         self.initial_location = parser.initial_location
         self.player_location = parser.player_location
         self.goal_locations = parser.goal_location
         self.terminal_locations = parser.terminal_locations
+        self.behavioral_toggles = parser.behavioral_toggles
+
+        # Should stochastic behaviour be enabled
+        self.use_stochastic_tiles = True
 
         # Reward reached when reaching goal or negative amount when terminal state will be reached
         self.goal_reward = goal_reward
@@ -120,6 +124,10 @@ class PartiallyObservableWorld(gym.Env):
         # Update player location
         self.player_location = new_location
 
+        # Account for behavioural toggle (disable/enable stochastic behaviour)
+        if self.player_location in self.behavioral_toggles:
+            self.use_stochastic_tiles = not self.use_stochastic_tiles
+
         # Reward is reached if goal is reached. This terminates the episode.
         reward = 0
         if self.player_location in self.reward_tiles.keys():
@@ -161,7 +169,7 @@ class PartiallyObservableWorld(gym.Env):
     def _get_new_location(self, action):
         old_action = action
         self.last_action_slip = False
-        if self.player_location in self.stochastic_tile.keys():
+        if self.player_location in self.stochastic_tile.keys() and self.use_stochastic_tiles:
             action = self.rules[self.stochastic_tile[self.player_location]].get_action(action)
         if old_action != action:
             self.last_action_slip = True
