@@ -16,13 +16,16 @@ is_partially_obs = False
 one_time_rewards = True
 
 env = gym.make(id='poge-v1',
-               world_file_path='worlds/world0.txt',
+               world_file_path='worlds/world1.txt',
                force_determinism=force_determinism,
                indicate_slip=indicate_slip,
                is_partially_obs=is_partially_obs,
-               one_time_rewards=one_time_rewards)
+               one_time_rewards=one_time_rewards,
+               step_penalty=-0.1)
 
 q_table = np.zeros([env.observation_space.n, env.action_space.n])
+
+env.play()
 
 # Hyper parameters
 alpha = 0.1

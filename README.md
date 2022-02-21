@@ -29,6 +29,7 @@ Reserved characters:
 - `D` - door in the wall (player just passes through it)
 - `E` - starting player location
 - `G` - goal location(s)
+- `T` - terminal state. If reached, negative goal reward will be given and episode will be terminated
 
 
 
@@ -171,6 +172,7 @@ is_partially_obs = False
 # If one_time_rewards is set to True, reward in single location will be obtained only once per episode.
 # Otherwise, reward will be given every time
 one_time_rewards = True
+# Step penalty defines a negative reward that is received every step if the reward is not obtained
 
 env = gym.make(id='poge-v1', 
                world_file_path='worlds/world0.txt',
@@ -178,5 +180,5 @@ env = gym.make(id='poge-v1',
                indicate_slip=indicate_slip,
                is_partially_obs=is_partially_obs,
                one_time_rewards=one_time_rewards,
-               step_penalty=0)
+               step_penalty=-0.1)
 ```

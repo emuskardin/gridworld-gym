@@ -132,7 +132,7 @@ class PartiallyObservableWorld(gym.Env):
             reward = self.goal_reward
 
         if self.step_penalty != 0 and reward == 0:
-            self.reward_tiles = self.step_penalty
+            reward = self.step_penalty
 
         done = 1 if self.player_location in self.goal_location or self.step_counter >= self.max_ep_len else 0
         observation = self.get_observation()
