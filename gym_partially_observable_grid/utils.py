@@ -115,7 +115,7 @@ class PartiallyObsGridworldParser:
                 if tile == 'T':
                     self.terminal_locations.add((x, y))
                 if tile == '@':
-                    self.behavioral_toggles.add((x,y))
+                    self.behavioral_toggles.add((x, y))
                 if tile != '#' and tile != 'D':
                     self.state_space += 1
 
@@ -146,11 +146,11 @@ class PartiallyObsGridworldParser:
             else:
                 self._parse_and_process_rule(line)
 
-        for i, x in enumerate(rule_world):
-            for y in x:
-                if y in self.rules.keys():
-                    tile_xy = (i, x.index(y))
-                    self.stochastic_tile[tile_xy] = y
+        for x, line in enumerate(rule_world):
+            for y, tile in enumerate(line):
+                if tile in self.rules.keys():
+                    tile_xy = (x, y)
+                    self.stochastic_tile[tile_xy] = tile
 
     def _parse_and_process_rule(self, rule):
         actions_dict = {'up': 0, 'down': 1, 'left': 2, 'right': 3}
