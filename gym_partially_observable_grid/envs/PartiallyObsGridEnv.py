@@ -204,6 +204,7 @@ class PartiallyObservableWorld(gym.Env):
     def reset(self):
         self.step_counter = 0
         self.slip_action = None
+        self.use_stochastic_tiles = True
         self.player_location = self.initial_location[0], self.initial_location[1]
         self.collected_rewards.clear()
         return self.encode(self.get_observation())
