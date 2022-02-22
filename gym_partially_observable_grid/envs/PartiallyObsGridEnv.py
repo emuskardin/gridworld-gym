@@ -19,10 +19,13 @@ class PartiallyObservableWorld(gym.Env):
 
         # Available actions
         self.actions_dict = {'up': 0, 'down': 1, 'left': 2, 'right': 3}
+        self.action_space_to_act_map = {i:k for k,i in self.actions_dict.items()}
         self.actions = [0, 1, 2, 3]
 
         parser = PartiallyObsGridworldParser(world_file_path)
 
+        # State space size from layout file
+        self.state_space = parser.state_space
         # Representation of concrete ((x,y) coordinates) world and abstract world
         self.world, self.abstract_world = parser.world, parser.abstract_world
         # Map of abstract symbols to their names (if any)
@@ -41,7 +44,7 @@ class PartiallyObservableWorld(gym.Env):
         # If true, once the executed action is not the same as the desired action,
         # 'slip' will be added to abstract output
         self.indicate_slip = indicate_slip
-        self.last_action_slip = False
+        self.slip_action = None
 
         # Indicate whether observations will be abstracted or will they be x-y coordinates
         self.is_partially_obs = is_partially_obs
@@ -99,9 +102,10 @@ class PartiallyObservableWorld(gym.Env):
 
         if self.rules:
             for state in list(self.state_2_one_hot_map.keys()):
-                slip_state = f'{state}_slip'
-                self.state_2_one_hot_map[slip_state] = counter
-                counter += 1
+                for act in self.actions_dict.keys():
+                    slip_state = f'{state}_slip_{act}'
+                    self.state_2_one_hot_map[slip_state] = counter
+                    counter += 1
 
         self.one_hot_2_state_map = {v: k for k, v in self.state_2_one_hot_map.items()}
         return counter
@@ -110,6 +114,7 @@ class PartiallyObservableWorld(gym.Env):
         assert action in self.actions
 
         self.step_counter += 1
+
         new_location = self._get_new_location(action)
         if self.world[new_location[0]][new_location[1]] == '#':
             observation = self.get_observation()
@@ -158,8 +163,8 @@ class PartiallyObservableWorld(gym.Env):
 
     def get_observation(self):
         if self.is_partially_obs:
-            if self.indicate_slip and self.last_action_slip:
-                observation = self.get_abstraction() + '_slip'
+            if self.indicate_slip and self.slip_action is not None:
+                observation = f'{self.get_abstraction()}_slip_{self.slip_action}'
             else:
                 observation = self.get_abstraction()
         else:
@@ -168,11 +173,12 @@ class PartiallyObservableWorld(gym.Env):
 
     def _get_new_location(self, action):
         old_action = action
-        self.last_action_slip = False
+        self.slip_action = None
+
         if self.player_location in self.stochastic_tile.keys() and self.use_stochastic_tiles:
             action = self.rules[self.stochastic_tile[self.player_location]].get_action(action)
         if old_action != action:
-            self.last_action_slip = True
+            self.slip_action = self.action_space_to_act_map[action]
         if action == 0:  # up
             return self.player_location[0] - 1, self.player_location[1]
         if action == 1:  # down
@@ -197,6 +203,7 @@ class PartiallyObservableWorld(gym.Env):
 
     def reset(self):
         self.step_counter = 0
+        self.slip_action = None
         self.player_location = self.initial_location[0], self.initial_location[1]
         self.collected_rewards.clear()
         return self.encode(self.get_observation())
@@ -214,5 +221,5 @@ class PartiallyObservableWorld(gym.Env):
         while True:
             self.render()
             action = input('Action: ', )
-            o = self.step(user_input_map[action])
-            print(f'Output: {o}')
+            output, reward, done, info = self.step(user_input_map[action])
+            print(f'Output: {self.decode(output), reward, done, info}')

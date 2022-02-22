@@ -29,6 +29,8 @@ class PartiallyObsGridworldParser:
     def __init__(self, path_to_file):
         self.content = defaultdict(list)
 
+        # State space
+        self.state_space = 0
         # Representation of concrete ((x,y) coordinates) world and abstract world
         self.world, self.abstract_world = None, None
         # Map of stochastic tiles, where each tile is identified by rule_id
@@ -114,6 +116,8 @@ class PartiallyObsGridworldParser:
                     self.terminal_locations.add((x, y))
                 if tile == '@':
                     self.behavioral_toggles.add((x,y))
+                if tile != '#' and tile != 'D':
+                    self.state_space += 1
 
         assert self.player_location and self.goal_location
 
