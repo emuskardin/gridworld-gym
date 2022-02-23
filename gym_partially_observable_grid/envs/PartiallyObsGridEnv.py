@@ -12,6 +12,7 @@ class PartiallyObservableWorld(gym.Env):
                  force_determinism=False,
                  indicate_slip=False,
                  is_partially_obs=True,
+                 indicate_wall=False,
                  max_ep_len=100,
                  goal_reward=100,
                  one_time_rewards=True,
@@ -45,6 +46,9 @@ class PartiallyObservableWorld(gym.Env):
         # 'slip' will be added to abstract output
         self.indicate_slip = indicate_slip
         self.slip_action = None
+
+        # If indicate_wall is set to True, suffix '_wall' will be added once the agent runs into the wall
+        self.indicate_wall = indicate_wall
 
         # Indicate whether observations will be abstracted or will they be x-y coordinates
         self.is_partially_obs = is_partially_obs
@@ -107,6 +111,11 @@ class PartiallyObservableWorld(gym.Env):
                     self.state_2_one_hot_map[slip_state] = counter
                     counter += 1
 
+        if self.indicate_wall:
+            for output in list(self.state_2_one_hot_map.keys()):
+                self.state_2_one_hot_map[f'{output}_wall'] = counter
+                counter += 1
+
         self.one_hot_2_state_map = {v: k for k, v in self.state_2_one_hot_map.items()}
         return counter
 
@@ -118,6 +127,8 @@ class PartiallyObservableWorld(gym.Env):
         new_location = self._get_new_location(action)
         if self.world[new_location[0]][new_location[1]] == '#':
             observation = self.get_observation()
+            if self.indicate_wall:
+                observation = f'{observation}_wall'
             done = True if self.step_counter >= self.max_ep_len else False
             return self.encode(observation), self.step_penalty, done, {}
 
@@ -179,6 +190,9 @@ class PartiallyObservableWorld(gym.Env):
             action = self.rules[self.stochastic_tile[self.player_location]].get_action(action)
         if old_action != action:
             self.slip_action = self.action_space_to_act_map[action]
+        return self.move(action)
+
+    def move(self, action):
         if action == 0:  # up
             return self.player_location[0] - 1, self.player_location[1]
         if action == 1:  # down
