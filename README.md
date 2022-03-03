@@ -1,7 +1,8 @@
 # POGE - Partially Observable Gridworld Environment 
 
 **POGE** is an gridworld environment generator for the [gym framework](https://gym.openai.com/). It puts special focus 
-on creation of deterministic or stochastic gridworlds with an option to toggle partial observability.  
+on creation of deterministic or stochastic gridworlds with an option to toggle partial observability. All created
+environments can be [scaled to any size](world_scaler.py).
 This environments can be used for testing and development of planning and classical RL algorithms.
 
 Partial observability stems from abstraction over the state representation.
