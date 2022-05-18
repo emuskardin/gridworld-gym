@@ -1,6 +1,10 @@
 from collections import defaultdict
 from random import choices
 
+# Available actions
+actions_dict = {'up': 0, 'down': 1, 'left': 2, 'right': 3}
+action_space_to_act_map = {i: k for k, i in actions_dict.items()}
+
 
 class StochasticTile:
     def __init__(self, rule_id):
@@ -173,3 +177,62 @@ class PartiallyObsGridworldParser:
             action_prob_pairs.append((action, prob))
 
         self.rules[rule_id].add_stochastic_action(rule_action, action_prob_pairs)
+
+    def _move(self, x, y, action):
+        if action == 'up':  # up
+            return x - 1, y
+        if action == 'down':  # down
+            return x + 1, y
+        if action == 'left':  # left
+            return x, y - 1
+        if action == 'right':  # right
+            return x, y + 1
+
+    def to_mdp(self):
+        from aalpy.automata import Mdp, MdpState
+
+        coordinates_to_state_map = dict()
+        for x, line in enumerate(self.world):
+            for y, tile in enumerate(line):
+                if tile in {'#', 'D'}:
+                    continue
+                abstract_tile = self.abstract_world[x][y]
+                if abstract_tile != ' ':
+                    output = self.abstract_symbol_name_map[abstract_tile]
+                else:
+                    output = (x, y)
+                coordinates_to_state_map[(x, y)] = MdpState(f's{len(coordinates_to_state_map.keys())}', output)
+
+        for x, line in enumerate(self.world):
+            print(line)
+            for y, tile in enumerate(line):
+                if tile in {'#', 'D'}:
+                    continue
+
+                for action in ['up', 'down', 'left', 'right']:
+                    if (x, y) in self.stochastic_tile.keys():
+                        rule = self.rules[self.stochastic_tile[(x, y)]]
+                        if actions_dict[action] in rule.keys():
+                            for new_action, probability in rule[action]:
+                                new_action = action_space_to_act_map[new_action]
+                                reached_state = self._move(x, y, new_action)
+                                if self.world[reached_state] == 'D':
+                                    reached_state = self._move(x, y, new_action)
+                                coordinates_to_state_map[(x, y)].transitions[action].append(
+                                    coordinates_to_state_map[reached_state], probability)
+                        else:
+                            reached_state = self._move(x, y, action)
+                            if self.world[reached_state] == 'D':
+                                reached_state = self._move(x, y, action)
+                            coordinates_to_state_map[(x, y)].transitions[action].append(
+                                coordinates_to_state_map[reached_state], 1.)
+                    else:
+                        reached_state = self._move(x, y, action)
+                        if self.world[reached_state] == 'D':
+                            reached_state = self._move(x, y, action)
+                        coordinates_to_state_map[(x, y)].transitions[action].append(
+                            coordinates_to_state_map[reached_state], 1.)
+
+        initial_state = coordinates_to_state_map[self.initial_location]
+
+        return Mdp(initial_state, list(coordinates_to_state_map.values()))
